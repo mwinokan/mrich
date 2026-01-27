@@ -1,4 +1,3 @@
-from pandas import DataFrame, Index
 from .console import console, console_print
 
 dict_keys = type(dict().keys())
@@ -9,21 +8,29 @@ def print(*args, **kwargs):
 
     new_args = []
 
-    for arg in args:
+    for i, arg in enumerate(args):
 
-        if isinstance(arg, DataFrame):
-            from .df import df_to_table
+        try:
+            from pandas import DataFrame, Index
 
-            table = df_to_table(args[0])
-            # console_print(table)
-            new_args.append(table)
+            if isinstance(arg, DataFrame):
+                from .df import df_to_table
 
-            # if args[1:]:
-            # print(args[1:], **kwargs)
+                # console_print(arg, type(arg))
+                table = df_to_table(arg)
+                new_args.append(table)
+                continue
 
-        elif isinstance(arg, dict_keys):
-            new_args.append(set(arg))
-        elif isinstance(arg, Index):
+            elif isinstance(arg, Index):
+                new_args.append(set(arg))
+                continue
+
+        except ModuleNotFoundError as e:
+            pass
+        except Exception as e:
+            raise
+
+        if isinstance(arg, dict_keys):
             new_args.append(set(arg))
 
         else:
