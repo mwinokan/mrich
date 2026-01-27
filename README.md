@@ -99,6 +99,12 @@ raise ValueError("rich formatted traceback is enabled by default")
 
 ## Development
 
+Additional packages are recommended for development:
+
+```
+pip install pre-commit black pytest
+```
+
 Some unit tests are available:
 
 ```
