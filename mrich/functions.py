@@ -8,7 +8,7 @@ from .tools import strip_formats
 
 def bold(*messages, **kwargs):
     text, formats = strip_formats(*messages, **kwargs)
-    text = Text(text)
+    text = Text(text.strip())
     text.stylize("bold")
     for style, start, end in formats:
         text.stylize(style, start, end)
@@ -17,7 +17,7 @@ def bold(*messages, **kwargs):
 
 def italic(*messages, **kwargs):
     text, formats = strip_formats(*messages, **kwargs)
-    text = Text(text)
+    text = Text(text.strip())
     text.stylize("italic")
     for style, start, end in formats:
         text.stylize(style, start, end)
@@ -26,7 +26,7 @@ def italic(*messages, **kwargs):
 
 def underline(*messages, **kwargs):
     text, formats = strip_formats(*messages, **kwargs)
-    text = Text(text)
+    text = Text(text.strip())
     text.stylize("underline")
     for style, start, end in formats:
         text.stylize(style, start, end)
@@ -79,7 +79,7 @@ def debug(*messages, **kwargs):
     return console_print(text)
 
 
-def title(*messages, **kwargs):
+def prompt(*messages, **kwargs):
     text = ">>>"
     text, formats = strip_formats(*messages, text=text, **kwargs)
     text = Text(f"{text}")
