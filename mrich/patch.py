@@ -9,7 +9,7 @@ try:
 
         if "margin:0px" not in JUPYTER_HTML_FORMAT:
             print(
-                "mrich: Jupyter may show unwanted line-spacing, run `mrich.patch_rich_jupyter_margins()` to patch"
+                'mrich: Jupyter may show unwanted line-spacing, run `"python -c import mrich; mrich.patch_rich_jupyter_margins()"` to patch'
             )
 except:
     pass
