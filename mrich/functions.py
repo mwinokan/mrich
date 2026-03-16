@@ -107,14 +107,41 @@ def writing(message):
 
 
 def var(
-    variable,
-    value,
-    unit: str | None = None,
+    *args,
     separator: str = "=",
     color: str | None = None,
     highlight: bool = True,
     highlight_if_rich_dunder: bool = False,
 ):
+
+    nargs = len(args)
+
+    if nargs == 1:
+        import re
+        import inspect
+
+        # get the variable name as defined in the code that called this function
+        frame = inspect.currentframe().f_back
+        call_line = inspect.getframeinfo(frame).code_context[0].strip()
+        match = re.search(r"var\((\w+)\)", call_line)
+
+        if match:
+            variable = match.group(1).strip()
+        else:
+            variable = "arg"
+
+        value = args[0]
+        unit = None
+    elif nargs == 2:
+        variable = args[0]
+        value = args[1]
+        unit = None
+    elif nargs == 3:
+        variable = args[0]
+        value = args[1]
+        unit = args[2]
+    else:
+        raise ValueError("Wrong number of arguments to mrich.var()")
 
     variable = Text(str(variable), style=COLOR_LOOKUP["var_name"])
     variable.stylize("bold")

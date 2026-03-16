@@ -33,6 +33,8 @@ def test_wrappers():
     mrich.disk("this_file_is_being_munged.txt", prefix="Modifying")
 
     # Format variables:
+    number = 101
+    mrich.var(number)
     mrich.var("variable", "value")
     mrich.var("#samples", 123)
     mrich.var("frequency", 12.7, "GHz")
@@ -41,6 +43,8 @@ def test_wrappers():
 
     # smaller section separator/header
     mrich.h3("This is a smaller header panel")
+
+    return
 
     # dynamic elements
 
