@@ -123,7 +123,7 @@ def var(
         # get the variable name as defined in the code that called this function
         frame = inspect.currentframe().f_back
         call_line = inspect.getframeinfo(frame).code_context[0].strip()
-        match = re.search(r"var\((\w+)\)", call_line)
+        match = re.search(r"var\((.+)\)", call_line)
 
         if match:
             variable = match.group(1).strip()
