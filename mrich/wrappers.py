@@ -1,6 +1,5 @@
 from .console import console, console_print
-
-dict_keys = type(dict().keys())
+from .tools import restyle_arg
 
 
 # wrappers
@@ -10,31 +9,8 @@ def print(*args, **kwargs):
 
     for i, arg in enumerate(args):
 
-        try:
-            from pandas import DataFrame, Index
-
-            if isinstance(arg, DataFrame):
-                from .df import df_to_table
-
-                # console_print(arg, type(arg))
-                table = df_to_table(arg)
-                new_args.append(table)
-                continue
-
-            elif isinstance(arg, Index):
-                new_args.append(set(arg))
-                continue
-
-        except ModuleNotFoundError as e:
-            pass
-        except Exception as e:
-            raise
-
-        if isinstance(arg, dict_keys):
-            new_args.append(set(arg))
-
-        else:
-            new_args.append(arg)
+        arg = restyle_arg(arg)
+        new_args.append(arg)
 
     console_print(*new_args, **kwargs)
 

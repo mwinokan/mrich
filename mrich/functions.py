@@ -1,7 +1,7 @@
 from .console import console, console_print
 from rich.text import Text
 from .colors import COLOR_LOOKUP
-from .tools import strip_formats
+from .tools import strip_formats, restyle_arg
 
 ### STYLES
 
@@ -143,8 +143,12 @@ def var(
     else:
         raise ValueError("Wrong number of arguments to mrich.var()")
 
+    # style variable
     variable = Text(str(variable), style=COLOR_LOOKUP["var_name"])
     variable.stylize("bold")
+
+    # to some type conversions if appropriate
+    value = restyle_arg(value)
 
     if "Path" in str(type(value)):
         color = "file"

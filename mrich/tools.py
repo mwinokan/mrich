@@ -1,5 +1,7 @@
 import re
 
+dict_keys = type(dict().keys())
+
 
 def detect_format_prefix(message):
 
@@ -38,3 +40,28 @@ def strip_formats(*messages, text="", separator=" "):
         start = end
 
     return text, formats
+
+
+def restyle_arg(arg):
+
+    try:
+        from pandas import DataFrame, Index
+
+        if isinstance(arg, DataFrame):
+            from .df import df_to_table
+
+            # console_print(arg, type(arg))
+            table = df_to_table(arg)
+            return table
+
+        elif isinstance(arg, Index):
+            return set(arg)
+
+    except ModuleNotFoundError:
+        pass
+
+    if isinstance(arg, dict_keys):
+        return set(arg)
+
+    else:
+        return arg
