@@ -127,6 +127,9 @@ def var(
 
         if match:
             variable = match.group(1).strip()
+            func_match = re.match(r"len\((.+)\)$", variable)
+            if func_match:
+                variable = f"#{func_match.group(1).strip()}"
         else:
             variable = "arg"
 

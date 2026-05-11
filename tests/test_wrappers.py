@@ -34,7 +34,10 @@ def test_wrappers():
 
     # Format variables:
     number = 101
+    numbers = [1,2,4,51,2]
     mrich.var(number)
+    mrich.var(numbers)
+    mrich.var(len(numbers))
     mrich.var("variable", "value")
     mrich.var("#samples", 123)
     mrich.var("frequency", 12.7, "GHz")
