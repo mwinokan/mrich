@@ -70,9 +70,8 @@ def success(*messages, **kwargs):
 
 
 def debug(*messages, **kwargs):
-    text = "DEBUG:"
-    text, formats = strip_formats(*messages, text=text, **kwargs)
-    text = Text(f"{text}")
+    text, formats = strip_formats(*messages, **kwargs)
+    text = Text(text.strip())
     text.stylize("debug")
     for style, start, end in formats:
         text.stylize(style, start, end)

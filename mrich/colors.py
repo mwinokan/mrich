@@ -7,7 +7,7 @@ COLOR_LOOKUP = {
     "error": "bold red",
     "warning": "dark_orange",
     "arg": "cyan3",
-    "debug": "bright_black",
+    "debug": "grey69",
 }
 
 from rich.theme import Theme
