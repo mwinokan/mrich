@@ -67,7 +67,7 @@ def track(*args, prefix: str = "Working...", **kwargs):
         yield from CURRENT_PROGRESS.track(*args, description=prefix, **kwargs)
 
 
-def set_progress_field(key: str = None, value=None, **kwargs):
+def set_progress_field(key: str | None = None, value=None, **kwargs):
     progress = CURRENT_PROGRESS
 
     if not progress:
@@ -78,8 +78,19 @@ def set_progress_field(key: str = None, value=None, **kwargs):
     if kwargs:
         for key, value in kwargs.items():
             task.fields[key] = value
-    else:
+    elif key:
         task.fields[key] = value
+
+
+def increment_progress_field(key: str):
+    progress = CURRENT_PROGRESS
+
+    if not progress:
+        return
+
+    task = progress.tasks[0]
+    current = int(task.fields[key])
+    task.fields[key] = current + 1
 
 
 def set_progress_prefix(text):
