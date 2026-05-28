@@ -171,7 +171,7 @@ def var(
         unit = Text(unit, style=COLOR_LOOKUP["var_type"])
         objects.append(unit)
 
-    console.print(*objects, markup=True, highlight=highlight)
+    console_print(*objects, markup=True, highlight=highlight)
 
 
 ### HEADINGS
