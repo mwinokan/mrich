@@ -34,7 +34,7 @@ def test_wrappers():
 
     # Format variables:
     number = 101
-    numbers = [1,2,4,51,2]
+    numbers = [1, 2, 4, 51, 2]
     mrich.var(number)
     mrich.var(numbers)
     mrich.var(len(numbers))
@@ -68,6 +68,7 @@ def test_wrappers():
         time.sleep(0.2)
         if i == 9:
             mrich.print("halfway there!")
+            mrich.var(i)
             mrich.set_progress_field("i_halfway", i)
 
     # tabular data
