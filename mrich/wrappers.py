@@ -3,16 +3,12 @@ from .tools import restyle_arg
 
 
 # wrappers
+def _build_print(*args):
+    return [restyle_arg(arg) for arg in args]
+
+
 def print(*args, **kwargs):
-
-    new_args = []
-
-    for i, arg in enumerate(args):
-
-        arg = restyle_arg(arg)
-        new_args.append(arg)
-
-    console_print(*new_args, **kwargs)
+    console_print(*_build_print(*args), **kwargs)
 
 
 def out(*args, **kwargs):

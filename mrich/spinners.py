@@ -24,7 +24,7 @@ def loading(*args, **kwargs):
 
 
 @contextmanager
-def clock(*args, **kwargs):
+def clock(*args, _on_complete=None, **kwargs):
     if args:
         status = args[0]
     else:
@@ -33,4 +33,8 @@ def clock(*args, **kwargs):
     with console.status(status, spinner="clock", **kwargs):
         yield
     elapsed = time.perf_counter() - start
-    console.print(f"{status} took {elapsed:.3f} seconds")
+    message = f"{status} took {elapsed:.3f} seconds"
+    if _on_complete:
+        _on_complete(message)
+    else:
+        console.print(message)

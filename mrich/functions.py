@@ -2,35 +2,48 @@ from .console import console, console_print
 from rich.text import Text
 from .colors import COLOR_LOOKUP
 from .tools import strip_formats, restyle_arg
+import inspect
 
 ### STYLES
 
 
-def bold(*messages, **kwargs):
+def _build_bold(*messages, **kwargs):
     text, formats = strip_formats(*messages, **kwargs)
     text = Text(text.strip())
     text.stylize("bold")
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
 
 
-def italic(*messages, **kwargs):
+def bold(*messages, **kwargs):
+    return console_print(_build_bold(*messages, **kwargs))
+
+
+def _build_italic(*messages, **kwargs):
     text, formats = strip_formats(*messages, **kwargs)
     text = Text(text.strip())
     text.stylize("italic")
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
 
 
-def underline(*messages, **kwargs):
+def italic(*messages, **kwargs):
+    return console_print(_build_italic(*messages, **kwargs))
+
+
+def _build_underline(*messages, **kwargs):
     text, formats = strip_formats(*messages, **kwargs)
     text = Text(text.strip())
     text.stylize("underline")
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
+
+
+def underline(*messages, **kwargs):
+    return console_print(_build_underline(*messages, **kwargs))
 
 
 ### LOG
@@ -51,7 +64,7 @@ def warning(*messages, **kwargs):
     return console_print(_build_warning(*messages, **kwargs))
 
 
-def error(*messages, **kwargs):
+def _build_error(*messages, **kwargs):
     text = " ERROR "
     text, formats = strip_formats(*messages, text=text, **kwargs)
     text = Text(f"{text}!")
@@ -59,10 +72,14 @@ def error(*messages, **kwargs):
     text.stylize("reverse", 0, 7)
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
 
 
-def success(*messages, **kwargs):
+def error(*messages, **kwargs):
+    return console_print(_build_error(*messages, **kwargs))
+
+
+def _build_success(*messages, **kwargs):
     text = " Success "
     text, formats = strip_formats(*messages, text=text, **kwargs)
     text = Text(f"{text}!")
@@ -70,7 +87,11 @@ def success(*messages, **kwargs):
     text.stylize("reverse", 0, 9)
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
+
+
+def success(*messages, **kwargs):
+    return console_print(_build_success(*messages, **kwargs))
 
 
 def _build_debug(*messages, **kwargs):
@@ -86,23 +107,31 @@ def debug(*messages, **kwargs):
     return console_print(_build_debug(*messages, **kwargs))
 
 
-def prompt(*messages, **kwargs):
+def _build_prompt(*messages, **kwargs):
     text = ">>>"
     text, formats = strip_formats(*messages, text=text, **kwargs)
     text = Text(f"{text}")
     text.stylize("bold purple")
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
 
 
-def disk(message: str, *, prefix: str):
+def prompt(*messages, **kwargs):
+    return console_print(_build_prompt(*messages, **kwargs))
+
+
+def _build_disk(message: str, *, prefix: str):
     message = str(message)
     text = Text(f" DISK  {prefix} {message}...")
     text.stylize("file", 0, 6)
     text.stylize("reverse bold", 0, 6)
     text.stylize("file", 8 + len(prefix), 8 + len(prefix) + len(message))
-    return console_print(text)
+    return text
+
+
+def disk(message: str, *, prefix: str):
+    return console_print(_build_disk(message, prefix=prefix))
 
 
 def reading(message):
@@ -113,22 +142,15 @@ def writing(message):
     return disk(message, prefix="Writing")
 
 
-def var(
-    *args,
-    separator: str = "=",
-    color: str | None = None,
-    highlight: bool = True,
-    highlight_if_rich_dunder: bool = False,
-):
+def _resolve_var_name_from_frame(frame, args):
+    """Determines (variable, value, unit) from var()'s call-site, per its overload rules."""
 
     nargs = len(args)
 
     if nargs == 1:
         import re
-        import inspect
 
         # get the variable name as defined in the code that called this function
-        frame = inspect.currentframe().f_back
         call_line = inspect.getframeinfo(frame).code_context[0].strip()
         match = re.search(r"var\((.+)\)", call_line)
 
@@ -153,6 +175,18 @@ def var(
     else:
         raise ValueError("Wrong number of arguments to mrich.var()")
 
+    return variable, value, unit
+
+
+def _build_var(
+    variable,
+    value,
+    unit=None,
+    *,
+    separator: str = "=",
+    color: str | None = None,
+    highlight_if_rich_dunder: bool = False,
+):
     # style variable
     variable = Text(str(variable), style=COLOR_LOOKUP["var_name"])
     variable.stylize("bold")
@@ -166,6 +200,7 @@ def var(
     if color and color in COLOR_LOOKUP:
         color = COLOR_LOOKUP[color]
 
+    highlight = True
     if hasattr(value, "__rich__"):
         highlight = highlight_if_rich_dunder
 
@@ -178,28 +213,63 @@ def var(
         unit = Text(unit, style=COLOR_LOOKUP["var_type"])
         objects.append(unit)
 
+    return objects, highlight
+
+
+def var(
+    *args,
+    separator: str = "=",
+    color: str | None = None,
+    highlight_if_rich_dunder: bool = False,
+):
+    frame = inspect.currentframe().f_back
+    variable, value, unit = _resolve_var_name_from_frame(frame, args)
+
+    objects, highlight = _build_var(
+        variable,
+        value,
+        unit,
+        separator=separator,
+        color=color,
+        highlight_if_rich_dunder=highlight_if_rich_dunder,
+    )
+
     console_print(*objects, markup=True, highlight=highlight)
 
 
 ### HEADINGS
 
 
-def h1(message):
+def _build_h1(message):
     from rich.panel import Panel
 
     text = Text(message.upper(), justify="center")
     text.stylize("bold")
-    return console.print(Panel(text))
+    return Panel(text)
+
+
+def h1(message):
+    return console.print(_build_h1(message))
+
+
+def _build_h2(message):
+    from rich.rule import Rule
+
+    return Rule(message)
 
 
 def h2(message):
     return console.rule(message)
 
 
-def h3(message):
+def _build_h3(message):
     from rich.panel import Panel
 
-    return console.print(Panel.fit(message))
+    return Panel.fit(message)
+
+
+def h3(message):
+    return console.print(_build_h3(message))
 
 
 ### ALIASES
