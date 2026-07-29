@@ -3,10 +3,12 @@ from contextlib import contextmanager
 
 from .console import console
 
+
 # spinners
 def spinner(*args, **kwargs):
     if args:
         status = args[0]
+        args = args[1:]
     else:
         status = "working..."
     return console.status(status, *args, spinner="line", **kwargs)
@@ -15,9 +17,11 @@ def spinner(*args, **kwargs):
 def loading(*args, **kwargs):
     if args:
         status = args[0]
+        args = args[1:]
     else:
         status = "loading..."
     return console.status(status, *args, spinner="aesthetic", **kwargs)
+
 
 @contextmanager
 def clock(*args, **kwargs):

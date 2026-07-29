@@ -56,13 +56,13 @@ def test_wrappers():
     with mrich.clock("Waiting for something"):
         time.sleep(1)
 
-    # with mrich.loading("Loading"):
-    #     time.sleep(1)
-    #     mrich.print("Interruptions don't disrupt live elements")
-    #     time.sleep(2)
+    with mrich.loading("Loading"):
+        time.sleep(1)
+        mrich.print("Interruptions don't disrupt live elements")
+        time.sleep(2)
 
-    # with mrich.spinner("Spinning"):
-    #     time.sleep(1)
+    with mrich.spinner("Spinning"):
+        time.sleep(1)
 
     for i in mrich.track(range(20), prefix="tracking progress", total=20):
         time.sleep(0.2)
