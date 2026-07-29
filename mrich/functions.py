@@ -36,7 +36,7 @@ def underline(*messages, **kwargs):
 ### LOG
 
 
-def warning(*messages, **kwargs):
+def _build_warning(*messages, **kwargs):
     text = " Warning "
     text, formats = strip_formats(*messages, text=text, **kwargs)
     text = Text(f"{text}!")
@@ -44,7 +44,11 @@ def warning(*messages, **kwargs):
     text.stylize("reverse bold", 0, 9)
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
+
+
+def warning(*messages, **kwargs):
+    return console_print(_build_warning(*messages, **kwargs))
 
 
 def error(*messages, **kwargs):
@@ -69,13 +73,17 @@ def success(*messages, **kwargs):
     return console_print(text)
 
 
-def debug(*messages, **kwargs):
+def _build_debug(*messages, **kwargs):
     text, formats = strip_formats(*messages, **kwargs)
     text = Text(text.strip())
     text.stylize("debug")
     for style, start, end in formats:
         text.stylize(style, start, end)
-    return console_print(text)
+    return text
+
+
+def debug(*messages, **kwargs):
+    return console_print(_build_debug(*messages, **kwargs))
 
 
 def prompt(*messages, **kwargs):
