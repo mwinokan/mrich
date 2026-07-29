@@ -97,6 +97,50 @@ raise ValueError("rich formatted traceback is enabled by default")
 
 <img width="646" height="1077" alt="image" src="https://github.com/user-attachments/assets/30d7efda-7d17-4590-875b-10056f8f9afa" />
 
+## Logging integration
+
+For use cases like Django where output needs to be routed through Python's standard `logging` module (e.g. for per-module filtering, file handlers, or centralized log config), `mrich` provides a parallel API via `get_logger`:
+
+```python
+from mrich import get_logger
+
+logger = get_logger(__name__)
+
+logger.h1("Welcome to mrich")
+logger.print("Regular message")
+logger.bold("bold text")
+logger.success("It worked")
+logger.error("Something failed")
+logger.warning("As are warnings")
+logger.debug("Inobtrusive debug statements")
+logger.var("count", 42)
+
+for i in logger.track(range(20)):
+    ...
+```
+
+`get_logger(name)` behaves like `logging.getLogger(name)` (repeated calls with the same name return the same object) and wraps it in an `MrichLogger`. Each mrich function (`print`, `bold`, `italic`, `underline`, `success`, `error`, `warning`, `debug`, `prompt`, `reading`, `writing`, `disk`, `var`, `h1`, `h2`, `h3`, `header`) is available as a method that emits a `logging.LogRecord` instead of printing directly:
+
+- `warning` → `WARNING`, `error` → `ERROR`, `debug`/`var` → `DEBUG`, everything else → `INFO`
+- Standard logging semantics apply: level filtering, handlers, propagation, and `logging.config.dictConfig` all work as expected
+- Each record carries the styled Rich renderable so that Rich-aware handlers keep full formatting, while plain handlers still get a sensible message
+
+Interactive-only features (`track`, `spinner`, `loading`, `clock`, `set_progress_field`, `increment_progress_field`) still render live on the console via `MrichLogger` and do not produce log records — `clock` is the one exception, which logs its completion message.
+
+If a logger obtained via `get_logger` has no handler configured (and none of its ancestors do either), an `mrich.logging.MrichHandler` is attached automatically so console output works out of the box. For custom setups (e.g. file logging or Django's `LOGGING` dict), configure handlers/formatters as usual:
+
+```python
+import logging
+from mrich.logging import MrichHandler, PlainTextFormatter
+
+logger = logging.getLogger("myapp")
+logger.addHandler(MrichHandler())  # Rich-styled console output
+
+file_handler = logging.FileHandler("myapp.log")
+file_handler.setFormatter(PlainTextFormatter("%(asctime)s %(levelname)s %(message)s"))
+logger.addHandler(file_handler)  # plain text, styling stripped
+```
+
 ## Development
 
 Additional packages are recommended for development:
