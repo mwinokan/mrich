@@ -44,11 +44,13 @@ def strip_formats(*messages, text="", separator=" "):
 
 def restyle_arg(arg):
 
+    ### PANDAS
+
     try:
         from pandas import DataFrame, Index
 
         if isinstance(arg, DataFrame):
-            from .df import df_to_table
+            from .table import df_to_table
 
             # console_print(arg, type(arg))
             table = df_to_table(arg)
@@ -59,6 +61,28 @@ def restyle_arg(arg):
 
     except ModuleNotFoundError:
         pass
+
+    ### ARRAYS
+
+    try:
+        from numpy import array
+
+        a = array(arg)
+
+        match a.ndim:
+            case 1:
+                return list(arg)
+            case 2:
+                from .table import array_to_table
+
+                return array_to_table(a)
+            case _:
+                pass
+
+    except ModuleNotFoundError:
+        pass
+
+    ### SETS
 
     if isinstance(arg, dict_keys):
         return set(arg)
