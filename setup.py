@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mrich",
-    version="1.10",
+    version="1.11",
     author="Max Winokan",
     author_email="mwinokan@me.com",
     description="Pretty-printing wrappers around Rich",
