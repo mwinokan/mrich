@@ -19,7 +19,7 @@ def df_to_table(df):
             table.add_column("index")
 
     for col in df.columns:
-        table.add_column(col)
+        table.add_column(str(col))
 
     for index, row in df.iterrows():
 
