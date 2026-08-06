@@ -173,7 +173,7 @@ class MrichLogger:
             import re
 
             call_line = inspect.getframeinfo(frame).code_context[0].strip()
-            match = re.search(r"\.var\((.+?)\)", call_line)
+            match = re.search(r"var\((.+)\)", call_line)
 
             if match:
                 variable = match.group(1).strip()
@@ -210,7 +210,7 @@ class MrichLogger:
             else:
                 text.append(str(obj))
 
-        self._emit(logging.DEBUG, text)
+        self._emit(logging.INFO, text)
 
     def track(self, *args, **kwargs):
         from .wrappers import track
