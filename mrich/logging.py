@@ -41,23 +41,26 @@ class MrichHandler(RichHandler):
         super().emit(record)
 
 
+def _renderable_to_plain(renderable):
+    """Render a Rich renderable to unstyled text."""
+    if hasattr(renderable, "plain"):
+        return renderable.plain
+
+    from io import StringIO
+    from rich.console import Console
+
+    buf = StringIO()
+    Console(file=buf, no_color=True, highlight=False, width=120).print(renderable)
+    return buf.getvalue().rstrip("\n")
+
+
 class PlainTextFormatter(logging.Formatter):
     """Formatter that strips Rich styling from renderables for plain-text handlers."""
 
     def format(self, record):
         renderable = getattr(record, "_rich_renderable", None)
         if renderable is not None:
-            if hasattr(renderable, "plain"):
-                record.msg = renderable.plain
-            else:
-                from io import StringIO
-                from rich.console import Console
-
-                buf = StringIO()
-                Console(file=buf, no_color=True, highlight=False, width=120).print(
-                    renderable
-                )
-                record.msg = buf.getvalue().rstrip("\n")
+            record.msg = _renderable_to_plain(renderable)
             record.args = None
         return super().format(record)
 
@@ -121,8 +124,31 @@ class MrichLogger:
         from .wrappers import _build_print
 
         renderables = _build_print(*args)
-        text = Text(" ".join(str(r) for r in renderables))
-        self._emit(logging.INFO, text)
+
+        if any(hasattr(r, "__rich_console__") for r in renderables):
+            from rich.console import Group
+
+            # group runs of plain values onto a single line, as mrich.print does
+            parts = []
+            plain = []
+            for r in renderables:
+                if hasattr(r, "__rich_console__"):
+                    if plain:
+                        parts.append(Text(" ".join(plain)))
+                        plain = []
+                    parts.append(r)
+                else:
+                    plain.append(str(r))
+            if plain:
+                parts.append(Text(" ".join(plain)))
+
+            renderable = Group(*parts)
+            plain_message = None
+        else:
+            renderable = Text(" ".join(str(r) for r in renderables))
+            plain_message = renderable.plain
+
+        self._emit(logging.INFO, renderable, plain_message=plain_message)
 
     def prompt(self, *messages, **kwargs):
         from .functions import _build_prompt
